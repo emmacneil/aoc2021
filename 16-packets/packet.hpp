@@ -8,6 +8,7 @@
 
 struct packet
 {
+    virtual ~packet() {}
     virtual uint32_t add_versions() { return version; }
     virtual uint64_t evaluate() { return 0; }
     static uint32_t parse(packet* &p, std::istream& is);
