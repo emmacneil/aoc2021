@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <chrono>
+#include <cstring>
 #include <iostream>
 #include <queue>
 #include <stdint.h>

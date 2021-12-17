@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <chrono>
+#include <cstring>
 #include <iostream>
 #include <queue>
 #include <stdint.h>
@@ -17,7 +18,7 @@ int main(int argc, char *argv[])
     std::cin >> line;
     size_t inner_width = line.size();
     size_t outer_width = 5 * inner_width;
-    
+
     uint8_t** costs;
     costs = new uint8_t * [outer_width];
     costs[0] = new uint8_t[outer_width * outer_width]{ 0 };
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
     bool** visited;
     visited = new bool * [outer_width];
     visited[0] = new bool[outer_width * outer_width]{ 0 };
-    
+
     for (size_t i = 1; i < outer_width; i++)
     {
         costs[i] = costs[i - 1] + outer_width;
