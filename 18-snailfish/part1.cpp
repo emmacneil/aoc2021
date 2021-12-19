@@ -26,20 +26,16 @@ int main(int argc, char *argv[])
     std::string line;
     std::cin >> line;
     std::stringstream ss(line);
-    tree *t = str_to_tree(ss);
+    tree *t = new tree(ss);
 
     while (std::cin >> line)
     {
         ss.str(line);
-        tree *l = t, *r = str_to_tree(ss);
-        t = new tree;
-        t->left = l;
-        t->right = r;
-        l->parent = t;
-        r->parent = t;
+        tree *l = t, *r = new tree(ss);
+        t = new tree(l, r);
         t->reduce();
     }
-    std::cout << t->magnitude() << std::endl;
+    std::cout << t->magnitude<uint16_t>() << std::endl;
 
     delete t;
 

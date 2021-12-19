@@ -43,17 +43,13 @@ int main(int argc, char *argv[])
             uint16_t mag;
 
             ss.str(lines[i]);
-            l = str_to_tree(ss);
+            l = new tree(ss);
             ss.str(lines[j]);
-            r = str_to_tree(ss);
+            r = new tree(ss);
 
-            t = new tree;
-            t->left = l;
-            t->right = r;
-            l->parent = t;
-            r->parent = t;
+            t = new tree(l, r);
             t->reduce();
-            mag = t->magnitude();
+            mag = t->magnitude<uint16_t>();
             max_mag = mag > max_mag ? mag : max_mag;
             delete t;
         }

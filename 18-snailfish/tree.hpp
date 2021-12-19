@@ -8,13 +8,15 @@ struct tree
 {
     tree() : data(0), parent(nullptr), left(nullptr), right(nullptr) {}
     tree(tree *parent, uint8_t data) : data(data), parent(parent), left(nullptr), right(nullptr) {}
+    tree(std::istream &is, tree *parent = nullptr);
+    tree(tree *left, tree *right) : data(0), parent(nullptr), left(left), right(right) {left->parent = this; right->parent = this;};
     ~tree() { delete left; delete right; }
+
     tree *first() { return left ? left->first() : this; }
     tree *last() { return right ? right->last() : this; }
     tree *next();
     tree *prev();
-    uint16_t magnitude();
-
+    template <typename T> T magnitude();
     bool explode(int depth = 0);
     void reduce();
     bool split();
@@ -25,41 +27,33 @@ struct tree
 
 bool tree::explode(int depth)
 {
-    if (depth == 4 && left && right)
+    if (left && right)
     {
-        if (left->prev()) left->prev()->data += left->data;
-        if (right->next()) right->next()->data += right->data;
-        delete left;
-        delete right;
-        left = nullptr;
-        right = nullptr;
-        return true;
+        if (depth == 4)
+        {
+            if ( left->prev())  left->prev()->data +=  left->data;
+            if (right->next()) right->next()->data += right->data;
+            delete left;  left = nullptr;
+            delete right; right = nullptr;
+            return true;
+        }
+        return left->explode(depth + 1) || right->explode(depth + 1);
     }
-    if (!left || !right)
-    {
-        // If this is a leaf node
-        return false;
-    }
-    return left->explode(depth + 1) || right->explode(depth + 1);
+    return false;
 }
 
-uint16_t tree::magnitude()
+template <typename T> T tree::magnitude()
 {
-    uint16_t ret = (uint16_t)data;
-    if (left)  ret += 3*left->magnitude();
-    if (right) ret += 2*right->magnitude();
-    return ret;
+    return (left && right) ? T(3)*left->magnitude<T>() + T(2)*right->magnitude<T>() : (T)data;
 }
 
-// Assumes this function is called on a leaf node (otherwise will crash!)
 // Returns the leaf node to the right of this one, if one exists. Otherwise returns nullptr.
+// Assumes this is a leaf node, otherwise it makes no sense to call anyway and may crash
 tree *tree::next()
 {
-    tree *t = this;
-    tree *p = parent;
-
     // Ascend the tree until this is no longer the right-most leaf of the subtree we are looking at.
     // If we get all the way to the tree's root, then there is no next leaf. We were at the end.
+    tree *t = this, *p = parent;
     while (p->right == t)
     {
         t = p;
@@ -75,11 +69,9 @@ tree *tree::next()
 // Returns the leaf node to the left  of this one, if one exists. Otherwise returns nullptr.
 tree *tree::prev()
 {
-    tree *t = this;
-    tree *p = parent;
-
     // Ascend the tree until this is no longer the left-most leaf of the subtree we are looking at.
-    // If we get all the way to the tree's root, then there is no next leaf. We were at the end.
+    // If we get all the way to the tree's root, then there is no next leaf. We were at the beginning.
+    tree *t = this, *p = parent;
     while (p->left == t)
     {
         t = p;
@@ -93,8 +85,7 @@ tree *tree::prev()
 
 void tree::reduce()
 {
-    while (explode() || split())
-        continue;
+    while (explode() || split()) continue;
 }
 
 bool tree::split()
@@ -112,27 +103,22 @@ bool tree::split()
     return false;
 }
 
-tree *str_to_tree(std::istream &is)
+tree::tree(std::istream &is, tree *parent)
+ : tree(parent, (uint8_t)0)
 {
-    tree *t = new tree();
-
     char ch;
     is >> ch;
     if (ch == '[')
     {
-        t->left = str_to_tree(is);
+        left = new tree(is, this);
         is.ignore(1); // ignore ','
-        t->right = str_to_tree(is);
+        right = new tree(is, this);
         is.ignore(1); // ignore ']'
-        t->left->parent = t;
-        t->right->parent = t;
     }
     else // '0' <= ch <= '9'
     {
-        t->data = (uint8_t)(ch - '0');
+        data = (uint8_t)(ch - '0');
     }
-
-    return t;
 }
 
 #endif
