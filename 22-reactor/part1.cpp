@@ -49,6 +49,9 @@ int main(int argc, char* argv[])
         assert(b.y1 <= b.y2);
         assert(b.z1 <= b.z2);
 
+        if (b.x1 < -50 || b.x2 > 50 || b.y1 < -50 || b.y2 > 50 || b.z1 < -50 || b.z2 > 50)
+            continue;
+
         if (on_off == "on")
             bs.add(b);
         else
