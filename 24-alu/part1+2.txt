@@ -1,0 +1,23 @@
+Solved by hand
+
+The MONAD program repeats the same sequence of instructions fourteen times.
+Very roughly:
+
+	(1) Get a digit (1-9) and store it in w.
+	(2) If w = z%26 + some number, do nothing.
+	(3) Otherwise, z = z*26 + some other number.
+
+Seven of the fourteen times this is done, z is also divided by 26 at some point, forcing it towards zero.
+Also, seven of fourteen times, the condition in step (2) cannot be satisfied for any value of 1 <= w <= 9, causing z to grow.
+We need to choose values of w so that the condition in (2) is satisfied every time possible.
+Tracing through the code, we can also determine that "some number" in step (2) is an expression involving exactly one previously encountered input digit.
+
+Label the fourteen input digits ABCDEFGHIJKLMN.
+We end up with 7 easy equations relating pairs of digits, e.g.
+
+	D = C + 2
+	...
+	N = A - 4
+
+Choosing values of AB..N so that one in each related pair is a 9 gives the maximum valid serial number.
+For part 2, choose AB..N so that each pair has a 1.
